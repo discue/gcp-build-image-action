@@ -4,6 +4,52 @@ GCP Build Image Action is a GitHub Action that builds and pushes container image
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
+## Commit Message Requirements
+
+**ALL commits MUST follow the Conventional Commits specification with NO EXCEPTIONS.**
+
+### Conventional Commits Format
+All commit messages must follow the format specified at https://www.conventionalcommits.org/en/v1.0.0/:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Required Elements
+- **Type**: MUST be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+- **Description**: MUST be present, use imperative mood, lowercase, no ending period
+- **Breaking Changes**: MUST be indicated with `!` after type/scope or `BREAKING CHANGE:` in footer
+
+### Examples of Valid Commit Messages
+```
+feat: add support for custom buildpack selection
+fix: resolve authentication timeout in gcloud submit
+docs: update README with new configuration options
+style: format action.yml with consistent indentation
+refactor: extract common validation logic
+perf: optimize docker layer caching
+test: add integration tests for Cloud Build
+build: update dependencies to latest versions
+ci: add conventional commit validation workflow
+chore: update .gitignore patterns
+feat!: remove deprecated legacy-format input
+fix(auth): handle expired service account tokens
+```
+
+### Invalid Examples (DO NOT USE)
+```
+❌ Update README
+❌ Fixed bug
+❌ WIP: work in progress
+❌ Merge branch 'feature'
+❌ feat: Add new feature.  (ends with period)
+❌ Feat: add feature (uppercase type)
+```
+
 ## Working Effectively
 
 ### Repository Structure
