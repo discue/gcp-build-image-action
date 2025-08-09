@@ -1,0 +1,71 @@
+name: Test Action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Test action syntax
+        run: |
+          # Check if action.yml exists and is valid YAML
+          if [ ! -f action.yml ]; then
+            echo "❌ action.yml not found"
+            exit 1
+          fi
+          
+          # Basic YAML syntax check
+          python3 -c "import yaml; yaml.safe_load(open('action.yml'))" || {
+            echo "❌ action.yml is not valid YAML"
+            exit 1
+          }
+          
+          echo "✅ action.yml syntax is valid"
+          
+      - name: Validate action metadata
+        run: |
+          # Check required fields
+          if ! grep -q "name:" action.yml; then
+            echo "❌ Missing 'name' field in action.yml"
+            exit 1
+          fi
+          
+          if ! grep -q "description:" action.yml; then
+            echo "❌ Missing 'description' field in action.yml"
+            exit 1
+          fi
+          
+          if ! grep -q "runs:" action.yml; then
+            echo "❌ Missing 'runs' field in action.yml"
+            exit 1
+          fi
+          
+          echo "✅ Required action.yml fields are present"
+          
+      - name: Check README
+        run: |
+          if [ ! -f README.md ]; then
+            echo "❌ README.md not found"
+            exit 1
+          fi
+          
+          # Check for essential sections
+          if ! grep -q "## Usage" README.md; then
+            echo "❌ Missing Usage section in README.md"
+            exit 1
+          fi
+          
+          if ! grep -q "## Inputs" README.md; then
+            echo "❌ Missing Inputs section in README.md"
+            exit 1
+          fi
+          
+          echo "✅ README.md has required sections"
