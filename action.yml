@@ -1,0 +1,72 @@
+name: 'GCP Build Image'
+description: 'Build and push container images to Google Cloud using Cloud Build'
+author: 'discue'
+
+inputs:
+  image:
+    description: 'The full image URL to build (e.g., europe-west3-docker.pkg.dev/project/repository/image)'
+    required: true
+  
+  project:
+    description: 'Google Cloud project ID'
+    required: false
+    
+  region:
+    description: 'Google Cloud region'
+    required: false
+    
+  quiet:
+    description: 'Run in quiet mode'
+    required: false
+    default: 'true'
+    
+  source:
+    description: 'Source directory to build from'
+    required: false
+    default: '.'
+
+outputs:
+  image-url:
+    description: 'The built image URL'
+    value: ${{ steps.build.outputs.image-url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build image with Cloud Build
+      id: build
+      shell: bash
+      run: |
+        # Set up variables
+        IMAGE="${{ inputs.image }}"
+        SOURCE="${{ inputs.source }}"
+        QUIET_FLAG=""
+        
+        if [[ "${{ inputs.quiet }}" == "true" ]]; then
+          QUIET_FLAG="--quiet"
+        fi
+        
+        # Set project if provided
+        if [[ -n "${{ inputs.project }}" ]]; then
+          gcloud config set project "${{ inputs.project }}"
+        fi
+        
+        # Set region if provided
+        if [[ -n "${{ inputs.region }}" ]]; then
+          gcloud config set builds/region "${{ inputs.region }}"
+        fi
+        
+        echo "Building image: $IMAGE"
+        echo "Source directory: $SOURCE"
+        
+        # Run gcloud builds submit
+        gcloud builds submit ${QUIET_FLAG} --pack image="${IMAGE}" "${SOURCE}"
+        
+        # Output the image URL
+        echo "image-url=${IMAGE}" >> $GITHUB_OUTPUT
+        
+        echo "Successfully built image: $IMAGE"
+
+branding:
+  icon: 'cloud'
+  color: 'blue'
