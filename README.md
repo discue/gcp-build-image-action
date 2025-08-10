@@ -1,11 +1,11 @@
 # GCP Build Image Action
 
-A GitHub Action to build and push container images to Google Cloud using Cloud Build with Buildpacks.
+A GitHub Action to build and push container images to Google Cloud using Cloud Build.
 
 ## Features
 
 - 🚀 Build container images using Google Cloud Build
-- 📦 Uses Cloud Native Buildpacks for automatic image creation
+- 📦 Uses Cloud Native Buildpacks for automatic image creation or custom Dockerfiles
 - 🔧 Configurable project, region, and build settings
 - ⚡ Simple and lightweight composite action
 
