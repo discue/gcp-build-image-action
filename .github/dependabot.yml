@@ -5,7 +5,5 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
     assignees:
       - "stfsy"
-    open-pull-requests-limit: 5
