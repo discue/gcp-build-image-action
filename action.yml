@@ -29,6 +29,11 @@ inputs:
     required: false
     default: "."
 
+  builder:
+    description: "Build method: 'buildpack' (default) or 'dockerfile'"
+    required: false
+    default: "buildpack"
+
 outputs:
   image-url:
     description: "The built image URL"
@@ -70,8 +75,27 @@ runs:
         echo "Source directory: $SOURCE"
 
 
-        # Run gcloud builds submit with optional impersonation
-        gcloud builds submit ${QUIET_FLAG} ${IMPERSONATE_FLAG} --pack image="${IMAGE}" "${SOURCE}"
+
+        # Determine build method: builder input, or auto-detect Dockerfile
+        BUILD_METHOD="${{ inputs.builder }}"
+        if [[ -z "$BUILD_METHOD" ]]; then
+          if [[ -f "$SOURCE/Dockerfile" ]]; then
+            BUILD_METHOD="dockerfile"
+          else
+            BUILD_METHOD="buildpack"
+          fi
+        fi
+
+        # Set build flag for gcloud
+        BUILD_FLAG=""
+        if [[ "$BUILD_METHOD" == "dockerfile" ]]; then
+          BUILD_FLAG="--tag \"${IMAGE}\""
+        else
+          BUILD_FLAG="--pack image=\"${IMAGE}\""
+        fi
+
+        # Run gcloud builds submit with the correct flag
+        eval gcloud builds submit ${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} "${SOURCE}"
 
         # Output the image URL
         echo "image-url=${IMAGE}" >> $GITHUB_OUTPUT

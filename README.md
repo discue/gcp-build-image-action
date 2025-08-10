@@ -76,6 +76,7 @@ jobs:
 | `region` | Google Cloud region for builds | No | Uses gcloud default |
 | `source` | Source directory to build from | No | `.` |
 | `quiet` | Run in quiet mode | No | `true` |
+| `builder` | Build method: `buildpack` (uses Cloud Native Buildpacks) or `dockerfile` (uses your Dockerfile). If not set, the action will auto-detect: uses Dockerfile if present in the source directory, otherwise uses buildpack. | No | Auto-detect |
 
 ## Outputs
 
