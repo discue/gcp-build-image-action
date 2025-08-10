@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/discue/gcp-build-image-action/compare/v1.1.0...v1.2.0) (2025-08-10)
+
+
+### Features
+
+* autodetect project's own dockerfiles ([c410789](https://github.com/discue/gcp-build-image-action/commit/c4107899d45d5873701399e366e54d30745c5c7b))
+
 ## [1.1.0](https://github.com/discue/gcp-build-image-action/compare/v1.0.0...v1.1.0) (2025-08-10)
 
 
