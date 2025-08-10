@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/discue/gcp-build-image-action/compare/v1.2.0...v1.3.0) (2025-08-10)
+
+
+### Features
+
+* use dockerfile/buildpack autodetection by default ([ddad03c](https://github.com/discue/gcp-build-image-action/commit/ddad03c8c3adb436db36df40b306276964b972c4))
+
 ## [1.2.0](https://github.com/discue/gcp-build-image-action/compare/v1.1.0...v1.2.0) (2025-08-10)
 
 
