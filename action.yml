@@ -30,9 +30,9 @@ inputs:
     default: "."
 
   builder:
-    description: "Build method: 'buildpack' (default) or 'dockerfile'"
+    description: "Build method: '' (default for autodetection), 'buildpack' or 'dockerfile'"
     required: false
-    default: "buildpack"
+    default: ""
 
 outputs:
   image-url:
@@ -73,8 +73,6 @@ runs:
 
         echo "Building image: $IMAGE"
         echo "Source directory: $SOURCE"
-
-
 
         # Determine build method: builder input, or auto-detect Dockerfile
         BUILD_METHOD="${{ inputs.builder }}"
