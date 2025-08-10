@@ -9,13 +9,3 @@ updates:
     assignees:
       - "stfsy"
     open-pull-requests-limit: 5
-
-  # Enable version updates for npm (example app)
-  - package-ecosystem: "npm"
-    directory: "/example"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    assignees:
-      - "stfsy"
-    open-pull-requests-limit: 5
