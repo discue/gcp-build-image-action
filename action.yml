@@ -15,6 +15,10 @@ inputs:
     description: "Google Cloud region"
     required: false
 
+  impersonate:
+    description: "Service account email to impersonate"
+    required: false
+
   quiet:
     description: "Run in quiet mode"
     required: false
@@ -42,6 +46,12 @@ runs:
         SOURCE="${{ inputs.source }}"
         QUIET_FLAG=""
 
+        # Set impersonation flag if provided
+        IMPERSONATE_FLAG=""
+        if [[ -n "${{ inputs.impersonate }}" ]]; then
+          IMPERSONATE_FLAG="--impersonate-service-account=${{ inputs.impersonate }}"
+        fi
+
         if [[ "${{ inputs.quiet }}" == "true" ]]; then
           QUIET_FLAG="--quiet"
         fi
@@ -59,8 +69,9 @@ runs:
         echo "Building image: $IMAGE"
         echo "Source directory: $SOURCE"
 
-        # Run gcloud builds submit
-        gcloud builds submit ${QUIET_FLAG} --pack image="${IMAGE}" "${SOURCE}"
+
+        # Run gcloud builds submit with optional impersonation
+        gcloud builds submit ${QUIET_FLAG} ${IMPERSONATE_FLAG} --pack image="${IMAGE}" "${SOURCE}"
 
         # Output the image URL
         echo "image-url=${IMAGE}" >> $GITHUB_OUTPUT
