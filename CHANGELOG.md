@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/discue/gcp-build-image-action/compare/v1.0.0...v1.1.0) (2025-08-10)
+
+
+### Features
+
+* allow impersonating another service account ([e75e102](https://github.com/discue/gcp-build-image-action/commit/e75e102ce3dc037eb3a78a1ceb67b72037a5ec0f))
+
 ## 1.0.0 (2025-08-10)
 
 
