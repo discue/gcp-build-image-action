@@ -21,7 +21,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Note: In a real workflow, you would configure GCP authentication here
       # - name: Authenticate to Google Cloud
