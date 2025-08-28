@@ -8,20 +8,24 @@ inputs:
     required: true
 
   region:
-    description: "Google Cloud region"
+    description: "Google Cloud region to use for the build (e.g., europe-west3). If not set, defaults to the gcloud default region."
     required: false
 
   impersonate:
-    description: "Service account email to impersonate"
+    description: "Service account email to impersonate for to submit the gcloud build. If not set, uses the default credentials."
+    required: false
+
+  build_service_account:
+    description: "Service account email to use for the Cloud Build execution. If not set, uses the default Cloud Build service account."
     required: false
 
   quiet:
-    description: "Run in quiet mode"
+    description: "Run in quiet mode. Suppress all non-error output. Default is true."
     required: false
     default: "true"
 
   source:
-    description: "Source directory to build from"
+    description: "Source directory to build (relative to the repository root). Default is the repository root."
     required: false
     default: "."
 
@@ -61,6 +65,7 @@ runs:
         QUIET_INPUT="${{ inputs.quiet }}"
         REGION_INPUT="${{ inputs.region }}"
         SOURCE_INPUT="${{ inputs.source }}"
+        BUILD_SERVICE_ACCOUNT_INPUT="${{ inputs.build_service_account }}"
 
         QUIET_FLAG=""
         if [[ "$QUIET_INPUT" == "true" ]]; then
@@ -102,8 +107,13 @@ runs:
         echo "Building image: $IMAGE_INPUT"
         echo "Source directory: $SOURCE_INPUT"
 
+        BUILD_SERVICE_ACCOUNT_FLAG=""
+        if [[ -n "$BUILD_SERVICE_ACCOUNT_INPUT" ]]; then
+          BUILD_SERVICE_ACCOUNT_FLAG="--service-account=$BUILD_SERVICE_ACCOUNT_INPUT"
+        fi
+
         # Merge all flags just before the submit command
-        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG}"
+        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG}"
         eval gcloud builds submit $FLAGS "$SOURCE_INPUT"
 
         echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT
