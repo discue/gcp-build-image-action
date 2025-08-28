@@ -69,6 +69,10 @@ runs:
         # Set region if provided
         if [[ -n "${{ inputs.region }}" ]]; then
           gcloud config set builds/region "${{ inputs.region }}"
+          GCS_BUCKET="gs://${{ inputs.project }}_${{ inputs.region }}_cloudbuild"
+          GCS_BUCKET_FLAG="--gcs-source-staging-dir=\"$GCS_BUCKET\""
+        else
+          GCS_BUCKET_FLAG=""
         fi
 
         echo "Building image: $IMAGE"
@@ -92,8 +96,8 @@ runs:
           BUILD_FLAG="--pack image=\"${IMAGE}\""
         fi
 
-        # Run gcloud builds submit with the correct flag
-        eval gcloud builds submit ${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} "${SOURCE}"
+        # Run gcloud builds submit with the correct flag and GCS bucket if set
+        eval gcloud builds submit ${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG} "${SOURCE}"
 
         # Output the image URL
         echo "image-url=${IMAGE}" >> $GITHUB_OUTPUT
