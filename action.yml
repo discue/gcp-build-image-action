@@ -7,7 +7,7 @@ inputs:
     description: "The full image URL to build (e.g., europe-west3-docker.pkg.dev/project/repository/image)"
     required: true
 
-  project:
+  project_id:
     description: "Google Cloud project ID"
     required: true
 
@@ -59,7 +59,7 @@ runs:
         # Initialize all variables at the beginning
         IMAGE="${{ inputs.image }}"
         SOURCE="${{ inputs.source }}"
-        PROJECT="${{ inputs.project }}"
+        PROJECT="${{ inputs.project_id }}"
         REGION="${{ inputs.region }}"
         IMPERSONATE_INPUT="${{ inputs.impersonate }}"
         QUIET_INPUT="${{ inputs.quiet }}"
