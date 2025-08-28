@@ -53,14 +53,14 @@ runs:
       shell: bash
       run: |
         # Initialize all variables at the beginning
-        IMAGE="${{ inputs.image }}"
-        SOURCE="${{ inputs.source }}"
-        REGION="${{ inputs.region }}"
-        IMPERSONATE_INPUT="${{ inputs.impersonate }}"
-        QUIET_INPUT="${{ inputs.quiet }}"
-        BUILDER_INPUT="${{ inputs.builder }}"
         BUCKET_NAME_INPUT="${{ inputs.staging_bucket_name }}"
         BUCKET_DIR_INPUT="${{ inputs.staging_bucket_dir }}"
+        BUILDER_INPUT="${{ inputs.builder }}"
+        IMAGE_INPUT="${{ inputs.image }}"
+        IMPERSONATE_INPUT="${{ inputs.impersonate }}"
+        QUIET_INPUT="${{ inputs.quiet }}"
+        REGION_INPUT="${{ inputs.region }}"
+        SOURCE_INPUT="${{ inputs.source }}"
 
         QUIET_FLAG=""
         if [[ "$QUIET_INPUT" == "true" ]]; then
@@ -72,8 +72,8 @@ runs:
           IMPERSONATE_FLAG="--impersonate-service-account=$IMPERSONATE_INPUT"
         fi
 
-        if [[ -n "$REGION" ]]; then
-          gcloud config set builds/region "$REGION"
+        if [[ -n "$REGION_INPUT" ]]; then
+          gcloud config set builds/region "$REGION_INPUT"
         fi
 
         GCS_BUCKET=""
@@ -85,7 +85,7 @@ runs:
 
         BUILD_METHOD="$BUILDER_INPUT"
         if [[ -z "$BUILD_METHOD" ]]; then
-          if [[ -f "$SOURCE/Dockerfile" ]]; then
+          if [[ -f "$SOURCE_INPUT/Dockerfile" ]]; then
             BUILD_METHOD="dockerfile"
           else
             BUILD_METHOD="buildpack"
@@ -94,21 +94,20 @@ runs:
 
         BUILD_FLAG=""
         if [[ "$BUILD_METHOD" == "dockerfile" ]]; then
-          BUILD_FLAG="--tag \"${IMAGE}\""
+          BUILD_FLAG="--tag \"${IMAGE_INPUT}\""
         else
-          BUILD_FLAG="--pack image=\"${IMAGE}\""
+          BUILD_FLAG="--pack image=\"${IMAGE_INPUT}\""
         fi
 
-        echo "Building image: $IMAGE"
-        echo "Source directory: $SOURCE"
+        echo "Building image: $IMAGE_INPUT"
+        echo "Source directory: $SOURCE_INPUT"
 
         # Merge all flags just before the submit command
         FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG}"
-        eval gcloud builds submit $FLAGS "$SOURCE"
+        eval gcloud builds submit $FLAGS "$SOURCE_INPUT"
 
-        echo "image-url=${IMAGE}" >> $GITHUB_OUTPUT
-
-        echo "Successfully built image: $IMAGE"
+        echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT
+        echo "Successfully built image: $IMAGE_INPUT"
 
 branding:
   icon: "package"
