@@ -7,10 +7,6 @@ inputs:
     description: "The full image URL to build (e.g., europe-west3-docker.pkg.dev/project/repository/image)"
     required: true
 
-  project_id:
-    description: "Google Cloud project ID"
-    required: true
-
   region:
     description: "Google Cloud region"
     required: false
@@ -35,7 +31,7 @@ inputs:
     default: ""
 
   bucket_name:
-    description: "Cloud Storage bucket name to use for staging (without gs:// or path). If empty, defaults to [project]_[region]_cloudbuild."
+    description: "Cloud Storage bucket name to use for staging (without gs:// or path). If empty, defaults to GCP default e.g. $project_$region_cloudbuild."
     required: false
     default: ""
 
@@ -59,7 +55,6 @@ runs:
         # Initialize all variables at the beginning
         IMAGE="${{ inputs.image }}"
         SOURCE="${{ inputs.source }}"
-        PROJECT="${{ inputs.project_id }}"
         REGION="${{ inputs.region }}"
         IMPERSONATE_INPUT="${{ inputs.impersonate }}"
         QUIET_INPUT="${{ inputs.quiet }}"
@@ -77,10 +72,6 @@ runs:
           IMPERSONATE_FLAG="--impersonate-service-account=$IMPERSONATE_INPUT"
         fi
 
-        if [[ -n "$PROJECT" ]]; then
-          gcloud config set project "$PROJECT"
-        fi
-
         if [[ -n "$REGION" ]]; then
           gcloud config set builds/region "$REGION"
         fi
@@ -88,8 +79,6 @@ runs:
         GCS_BUCKET=""
         if [[ -n "$BUCKET_NAME_INPUT" ]]; then
           GCS_BUCKET="gs://${BUCKET_NAME_INPUT}"
-        else
-          GCS_BUCKET="gs://${PROJECT}_${REGION}_cloudbuild"
         fi
 
         GCS_BUCKET_FLAG="--gcs-source-staging-dir=\"$GCS_BUCKET/$BUCKET_DIR_INPUT\""
