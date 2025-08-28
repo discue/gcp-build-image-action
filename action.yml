@@ -30,12 +30,12 @@ inputs:
     required: false
     default: ""
 
-  bucket_name:
+  staging_bucket_name:
     description: "Cloud Storage bucket name to use for staging (without gs:// or path). If empty, defaults to GCP default e.g. $project_$region_cloudbuild."
     required: false
     default: ""
 
-  bucket_dir:
+  staging_bucket_dir:
     description: "Directory within the Cloud Storage bucket to use for staging. Defaults to 'builds'."
     required: false
     default: "builds"
@@ -59,8 +59,8 @@ runs:
         IMPERSONATE_INPUT="${{ inputs.impersonate }}"
         QUIET_INPUT="${{ inputs.quiet }}"
         BUILDER_INPUT="${{ inputs.builder }}"
-        BUCKET_NAME_INPUT="${{ inputs.bucket_name }}"
-        BUCKET_DIR_INPUT="${{ inputs.bucket_dir }}"
+        BUCKET_NAME_INPUT="${{ inputs.staging_bucket_name }}"
+        BUCKET_DIR_INPUT="${{ inputs.staging_bucket_dir }}"
 
         QUIET_FLAG=""
         if [[ "$QUIET_INPUT" == "true" ]]; then
