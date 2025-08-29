@@ -106,6 +106,7 @@ runs:
 
         echo "Building image: $IMAGE_INPUT"
         echo "Source directory: $SOURCE_INPUT"
+        ls -l $SOURCE_INPUT
 
         BUILD_SERVICE_ACCOUNT_FLAG=""
         if [[ -n "$BUILD_SERVICE_ACCOUNT_INPUT" ]]; then
