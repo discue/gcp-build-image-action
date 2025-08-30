@@ -97,13 +97,6 @@ runs:
           fi
         fi
 
-        BUILD_FLAG=""
-        if [[ "$BUILD_METHOD" == "dockerfile" ]]; then
-          BUILD_FLAG="--tag \"${IMAGE_INPUT}\""
-        else
-          BUILD_FLAG="--pack image=\"${IMAGE_INPUT}\""
-        fi
-
         echo "Building image: $IMAGE_INPUT"
         echo "Source directory: $SOURCE_INPUT"
         ls -l $SOURCE_INPUT
@@ -114,7 +107,7 @@ runs:
         fi
 
         # Merge all flags just before the submit command
-        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG}"
+        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG}"
         eval gcloud builds submit --config cloudbuild.yaml $FLAGS "$SOURCE_INPUT"
 
         echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT
