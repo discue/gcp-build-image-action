@@ -115,7 +115,7 @@ runs:
 
         # Merge all flags just before the submit command
         FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG}"
-        eval gcloud builds submit $FLAGS "$SOURCE_INPUT"
+        eval gcloud builds submit --config cloudbuild.yaml $FLAGS "$SOURCE_INPUT"
 
         echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT
         echo "Successfully built image: $IMAGE_INPUT"
