@@ -65,6 +65,7 @@ jobs:
           region: 'europe-west3'
           source: './src'
           quiet: 'false'
+          substitutions: '_ENV=prod,_VERSION=${{ github.sha }}'
 ```
 
 ## Inputs
@@ -74,9 +75,14 @@ jobs:
 | `image` | The full image URL to build (e.g., `europe-west3-docker.pkg.dev/project/repository/image`) | Yes | - |
 | `project` | Google Cloud project ID | No | Uses gcloud default |
 | `region` | Google Cloud region for builds | No | Uses gcloud default |
+| `impersonate` | Service account email to impersonate to submit the gcloud build | No | Uses default credentials |
+| `build_service_account` | Service account email to use for the Cloud Build execution | No | Uses default Cloud Build service account |
 | `source` | Source directory to build from | No | `.` |
 | `quiet` | Run in quiet mode | No | `true` |
 | `builder` | Build method: `buildpack` (uses Cloud Native Buildpacks) or `dockerfile` (uses your Dockerfile). If not set, the action will auto-detect: uses Dockerfile if present in the source directory, otherwise uses buildpack. | No | Auto-detect |
+| `staging_bucket_name` | Cloud Storage bucket name to use for staging (without `gs://` or path) | No | GCP default (`$project_$region_cloudbuild`) |
+| `staging_bucket_dir` | Directory within the Cloud Storage bucket to use for staging | No | `builds` |
+| `substitutions` | Parameters to be substituted in the build specification (e.g., `_KEY=VALUE,_OTHER=VALUE`) | No | `""` |
 
 ## Outputs
 

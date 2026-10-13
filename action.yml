@@ -44,6 +44,11 @@ inputs:
     required: false
     default: "builds"
 
+  substitutions:
+    description: "Parameters to be substituted in the build specification (e.g., _KEY=VALUE,_OTHER=VALUE)."
+    required: false
+    default: ""
+
 outputs:
   image-url:
     description: "The built image URL"
@@ -66,6 +71,7 @@ runs:
         REGION_INPUT="${{ inputs.region }}"
         SOURCE_INPUT="${{ inputs.source }}"
         BUILD_SERVICE_ACCOUNT_INPUT="${{ inputs.build_service_account }}"
+        SUBSTITUTIONS_INPUT="${{ inputs.substitutions }}"
 
         QUIET_FLAG=""
         if [[ "$QUIET_INPUT" == "true" ]]; then
@@ -106,8 +112,13 @@ runs:
           BUILD_SERVICE_ACCOUNT_FLAG="--service-account=$BUILD_SERVICE_ACCOUNT_INPUT"
         fi
 
+        SUBSTITUTIONS_FLAG=""
+        if [[ -n "$SUBSTITUTIONS_INPUT" ]]; then
+          SUBSTITUTIONS_FLAG="--substitutions=\"$SUBSTITUTIONS_INPUT\""
+        fi
+
         # Merge all flags just before the submit command
-        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG}"
+        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG} ${SUBSTITUTIONS_FLAG}"
         eval gcloud builds submit --config cloudbuild.yaml $FLAGS "$SOURCE_INPUT"
 
         echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT

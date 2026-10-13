@@ -50,13 +50,13 @@ Follow the scoped instructions in `example/AGENTS.md`:
 - **Do NOT run**: Root workflow validations unless `.github/workflows/example.yml` or `action.yml` was also changed.
 
 ### 3. Cross-Boundary / Contract Changes
-- `action.yml` is the source of truth for action inputs (`image`, `region`, `impersonate`, `build_service_account`, `quiet`, `source`, `builder`, `staging_bucket_name`, `staging_bucket_dir`) and outputs (`image-url`).
+- `action.yml` is the source of truth for action inputs (`image`, `region`, `impersonate`, `build_service_account`, `quiet`, `source`, `builder`, `staging_bucket_name`, `staging_bucket_dir`, `substitutions`) and outputs (`image-url`).
 - If you add, rename, or remove an input or output in `action.yml`, update `README.md` (`## Inputs` / `## Outputs` and usage examples) and `.github/workflows/example.yml` if applicable, then run the root YAML and `README.md` checks.
 
 ## Code style & conventions
 - **Composite Action Bash Script (`action.yml`)**:
   - Initialize all GitHub Action inputs into upper-snake-case `*_INPUT` variables at the top of the `run:` block.
-  - Construct individual CLI flag variables (`QUIET_FLAG`, `IMPERSONATE_FLAG`, `GCS_BUCKET_FLAG`, `BUILD_SERVICE_ACCOUNT_FLAG`) conditionally using `[[ ... ]]`.
+  - Construct individual CLI flag variables (`QUIET_FLAG`, `IMPERSONATE_FLAG`, `GCS_BUCKET_FLAG`, `BUILD_SERVICE_ACCOUNT_FLAG`, `SUBSTITUTIONS_FLAG`) conditionally using `[[ ... ]]`.
   - Write step outputs to `$GITHUB_OUTPUT` (e.g., `echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT`).
 - **YAML Formatting**:
   - Use 2-space indentation across `action.yml` and `.github/workflows/*.yml`.
