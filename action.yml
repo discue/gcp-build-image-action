@@ -45,7 +45,7 @@ inputs:
     default: "builds"
 
   substitutions:
-    description: "Parameters to be substituted in the build specification (e.g., _KEY=VALUE,_OTHER=VALUE)."
+    description: "Parameters to be substituted in the build specification (multiline KEY=VALUE or comma-separated KEY=VALUE)."
     required: false
     default: ""
 
@@ -75,16 +75,16 @@ runs:
         set -euo pipefail
 
         # Initialize all variables at the beginning
-        BUCKET_NAME_INPUT="${INPUT_STAGING_BUCKET_NAME}"
-        BUCKET_DIR_INPUT="${INPUT_STAGING_BUCKET_DIR}"
-        BUILDER_INPUT="${INPUT_BUILDER}"
+        BUCKET_NAME_INPUT="${INPUT_STAGING_BUCKET_NAME:-}"
+        BUCKET_DIR_INPUT="${INPUT_STAGING_BUCKET_DIR:-builds}"
+        BUILDER_INPUT="${INPUT_BUILDER:-}"
         IMAGE_INPUT="${INPUT_IMAGE}"
-        IMPERSONATE_INPUT="${INPUT_IMPERSONATE}"
-        QUIET_INPUT="${INPUT_QUIET}"
-        REGION_INPUT="${INPUT_REGION}"
-        SOURCE_INPUT="${INPUT_SOURCE}"
-        BUILD_SERVICE_ACCOUNT_INPUT="${INPUT_BUILD_SERVICE_ACCOUNT}"
-        SUBSTITUTIONS_INPUT="${INPUT_SUBSTITUTIONS}"
+        IMPERSONATE_INPUT="${INPUT_IMPERSONATE:-}"
+        QUIET_INPUT="${INPUT_QUIET:-true}"
+        REGION_INPUT="${INPUT_REGION:-}"
+        SOURCE_INPUT="${INPUT_SOURCE:-.}"
+        BUILD_SERVICE_ACCOUNT_INPUT="${INPUT_BUILD_SERVICE_ACCOUNT:-}"
+        SUBSTITUTIONS_INPUT="${INPUT_SUBSTITUTIONS:-}"
 
         ARGS=()
 
@@ -155,8 +155,22 @@ runs:
 
         SUBSTITUTIONS_FLAG=""
         if [[ -n "$SUBSTITUTIONS_INPUT" ]]; then
-          SUBSTITUTIONS_FLAG="--substitutions=$SUBSTITUTIONS_INPUT"
-          ARGS+=("$SUBSTITUTIONS_FLAG")
+          SUBSTITUTIONS_JOINED=""
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
+            if [[ -n "$line" ]]; then
+              if [[ -z "$SUBSTITUTIONS_JOINED" ]]; then
+                SUBSTITUTIONS_JOINED="$line"
+              else
+                SUBSTITUTIONS_JOINED="${SUBSTITUTIONS_JOINED},${line}"
+              fi
+            fi
+          done <<< "$SUBSTITUTIONS_INPUT"
+          if [[ -n "$SUBSTITUTIONS_JOINED" ]]; then
+            SUBSTITUTIONS_FLAG="--substitutions=$SUBSTITUTIONS_JOINED"
+            ARGS+=("$SUBSTITUTIONS_FLAG")
+          fi
         fi
 
         # Merge all flags just before the submit command

@@ -63,7 +63,9 @@ jobs:
           region: 'europe-west3'
           source: './src'
           quiet: 'false'
-          substitutions: '_ENV=prod,_VERSION=${{ github.sha }}'
+          substitutions: |
+            _ENV=prod
+            _VERSION=${{ github.sha }}
 ```
 
 ## Inputs
@@ -79,7 +81,7 @@ jobs:
 | `builder` | Build method: `cloudbuild` (uses `cloudbuild.yaml`), `dockerfile` (uses your `Dockerfile`), or `buildpack` (uses Cloud Native Buildpacks). If not set, the action auto-detects `cloudbuild.yaml`, then `Dockerfile`, otherwise `buildpack`. | No | Auto-detect |
 | `staging_bucket_name` | Cloud Storage bucket name to use for staging (without `gs://` or path) | No | GCP default (`$project_$region_cloudbuild`) |
 | `staging_bucket_dir` | Directory within the Cloud Storage bucket to use for staging | No | `builds` |
-| `substitutions` | Parameters to be substituted in the build specification (e.g., `_KEY=VALUE,_OTHER=VALUE`) | No | `""` |
+| `substitutions` | Parameters to be substituted in the build specification (multiline `KEY=VALUE` or comma-separated `KEY=VALUE`) | No | `""` |
 
 ## Outputs
 
