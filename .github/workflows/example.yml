@@ -15,6 +15,9 @@ env:
   PROJECT_ID: ${{ github.event.inputs.project }}
   IMAGE_URL: ${{ github.event.inputs.image }}
 
+permissions:
+  contents: read
+
 jobs:
   build-example:
     runs-on: ubuntu-latest
@@ -36,8 +39,8 @@ jobs:
         id: build
         # For demonstration purposes, we'll just echo the command that would be run
         run: |
-          echo "Would run: gcloud builds submit --pack image=${{ env.IMAGE_URL }} ./example --quiet"
-          echo "image-url=${{ env.IMAGE_URL }}" >> $GITHUB_OUTPUT
+          echo "Would run: gcloud builds submit --pack image=${IMAGE_URL} ./example --quiet"
+          echo "image-url=${IMAGE_URL}" >> "$GITHUB_OUTPUT"
         
       # Uncomment this section to actually use the action:
       # - name: Build example app image
@@ -45,9 +48,10 @@ jobs:
       #   uses: ./
       #   with:
       #     image: ${{ env.IMAGE_URL }}
-      #     project: ${{ env.PROJECT_ID }}
       #     source: './example'
       
       - name: Show built image
+        env:
+          BUILT_IMAGE_URL: ${{ steps.build.outputs.image-url }}
         run: |
-          echo "Built image: ${{ steps.build.outputs.image-url }}"
+          echo "Built image: ${BUILT_IMAGE_URL}"
