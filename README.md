@@ -50,7 +50,6 @@ jobs:
         uses: discue/gcp-build-image-action@v1
         with:
           image: 'europe-west3-docker.pkg.dev/my-project/my-repo/my-app'
-          project: 'my-project'
           region: 'europe-west3'
 ```
 
@@ -61,7 +60,6 @@ jobs:
         uses: discue/gcp-build-image-action@v1
         with:
           image: 'europe-west3-docker.pkg.dev/my-project/my-repo/my-app:${{ github.sha }}'
-          project: 'my-project'
           region: 'europe-west3'
           source: './src'
           quiet: 'false'
@@ -73,13 +71,12 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `image` | The full image URL to build (e.g., `europe-west3-docker.pkg.dev/project/repository/image`) | Yes | - |
-| `project` | Google Cloud project ID | No | Uses gcloud default |
 | `region` | Google Cloud region for builds | No | Uses gcloud default |
 | `impersonate` | Service account email to impersonate to submit the gcloud build | No | Uses default credentials |
 | `build_service_account` | Service account email to use for the Cloud Build execution | No | Uses default Cloud Build service account |
 | `source` | Source directory to build from | No | `.` |
 | `quiet` | Run in quiet mode | No | `true` |
-| `builder` | Build method: `buildpack` (uses Cloud Native Buildpacks) or `dockerfile` (uses your Dockerfile). If not set, the action will auto-detect: uses Dockerfile if present in the source directory, otherwise uses buildpack. | No | Auto-detect |
+| `builder` | Build method: `cloudbuild` (uses `cloudbuild.yaml`), `dockerfile` (uses your `Dockerfile`), or `buildpack` (uses Cloud Native Buildpacks). If not set, the action auto-detects `cloudbuild.yaml`, then `Dockerfile`, otherwise `buildpack`. | No | Auto-detect |
 | `staging_bucket_name` | Cloud Storage bucket name to use for staging (without `gs://` or path) | No | GCP default (`$project_$region_cloudbuild`) |
 | `staging_bucket_dir` | Directory within the Cloud Storage bucket to use for staging | No | `builds` |
 | `substitutions` | Parameters to be substituted in the build specification (e.g., `_KEY=VALUE,_OTHER=VALUE`) | No | `""` |
@@ -161,7 +158,6 @@ jobs:
         uses: discue/gcp-build-image-action@v1
         with:
           image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}'
-          project: ${{ env.PROJECT_ID }}
           region: ${{ env.REGION }}
 
       - name: Deploy to Cloud Run

@@ -55,9 +55,9 @@ Follow the scoped instructions in `example/AGENTS.md`:
 
 ## Code style & conventions
 - **Composite Action Bash Script (`action.yml`)**:
-  - Initialize all GitHub Action inputs into upper-snake-case `*_INPUT` variables at the top of the `run:` block.
-  - Construct individual CLI flag variables (`QUIET_FLAG`, `IMPERSONATE_FLAG`, `GCS_BUCKET_FLAG`, `BUILD_SERVICE_ACCOUNT_FLAG`, `SUBSTITUTIONS_FLAG`) conditionally using `[[ ... ]]`.
-  - Write step outputs to `$GITHUB_OUTPUT` (e.g., `echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT`).
+  - Pass GitHub Action inputs via step `env:` (`INPUT_*`) and initialize upper-snake-case `*_INPUT` variables at the top of the `run:` block.
+  - Construct individual CLI flag variables (`QUIET_FLAG`, `IMPERSONATE_FLAG`, `BUILD_FLAG`, `GCS_BUCKET_FLAG`, `BUILD_SERVICE_ACCOUNT_FLAG`, `SUBSTITUTIONS_FLAG`) conditionally using `[[ ... ]]` and append them to the `ARGS` array (avoiding `eval`).
+  - Write step outputs to `"$GITHUB_OUTPUT"` (e.g., `echo "image-url=${IMAGE_INPUT}" >> "$GITHUB_OUTPUT"`).
 - **YAML Formatting**:
   - Use 2-space indentation across `action.yml` and `.github/workflows/*.yml`.
   - Quote strings containing colons, interpolations (`${{ ... }}`), or empty defaults (`""`).
