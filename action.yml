@@ -30,7 +30,7 @@ inputs:
     default: "."
 
   builder:
-    description: "Build method: '' (default for autodetection), 'buildpack' or 'dockerfile'"
+    description: "Build method: '' (default for autodetection), 'cloudbuild', 'buildpack' or 'dockerfile'"
     required: false
     default: ""
 
@@ -60,27 +60,44 @@ runs:
     - name: Build image with Cloud Build
       id: build
       shell: bash
+      env:
+        INPUT_STAGING_BUCKET_NAME: ${{ inputs.staging_bucket_name }}
+        INPUT_STAGING_BUCKET_DIR: ${{ inputs.staging_bucket_dir }}
+        INPUT_BUILDER: ${{ inputs.builder }}
+        INPUT_IMAGE: ${{ inputs.image }}
+        INPUT_IMPERSONATE: ${{ inputs.impersonate }}
+        INPUT_QUIET: ${{ inputs.quiet }}
+        INPUT_REGION: ${{ inputs.region }}
+        INPUT_SOURCE: ${{ inputs.source }}
+        INPUT_BUILD_SERVICE_ACCOUNT: ${{ inputs.build_service_account }}
+        INPUT_SUBSTITUTIONS: ${{ inputs.substitutions }}
       run: |
+        set -euo pipefail
+
         # Initialize all variables at the beginning
-        BUCKET_NAME_INPUT="${{ inputs.staging_bucket_name }}"
-        BUCKET_DIR_INPUT="${{ inputs.staging_bucket_dir }}"
-        BUILDER_INPUT="${{ inputs.builder }}"
-        IMAGE_INPUT="${{ inputs.image }}"
-        IMPERSONATE_INPUT="${{ inputs.impersonate }}"
-        QUIET_INPUT="${{ inputs.quiet }}"
-        REGION_INPUT="${{ inputs.region }}"
-        SOURCE_INPUT="${{ inputs.source }}"
-        BUILD_SERVICE_ACCOUNT_INPUT="${{ inputs.build_service_account }}"
-        SUBSTITUTIONS_INPUT="${{ inputs.substitutions }}"
+        BUCKET_NAME_INPUT="${INPUT_STAGING_BUCKET_NAME}"
+        BUCKET_DIR_INPUT="${INPUT_STAGING_BUCKET_DIR}"
+        BUILDER_INPUT="${INPUT_BUILDER}"
+        IMAGE_INPUT="${INPUT_IMAGE}"
+        IMPERSONATE_INPUT="${INPUT_IMPERSONATE}"
+        QUIET_INPUT="${INPUT_QUIET}"
+        REGION_INPUT="${INPUT_REGION}"
+        SOURCE_INPUT="${INPUT_SOURCE}"
+        BUILD_SERVICE_ACCOUNT_INPUT="${INPUT_BUILD_SERVICE_ACCOUNT}"
+        SUBSTITUTIONS_INPUT="${INPUT_SUBSTITUTIONS}"
+
+        ARGS=()
 
         QUIET_FLAG=""
         if [[ "$QUIET_INPUT" == "true" ]]; then
           QUIET_FLAG="--quiet"
+          ARGS+=("$QUIET_FLAG")
         fi
 
         IMPERSONATE_FLAG=""
         if [[ -n "$IMPERSONATE_INPUT" ]]; then
           IMPERSONATE_FLAG="--impersonate-service-account=$IMPERSONATE_INPUT"
+          ARGS+=("$IMPERSONATE_FLAG")
         fi
 
         if [[ -n "$REGION_INPUT" ]]; then
@@ -88,40 +105,65 @@ runs:
         fi
 
         GCS_BUCKET=""
+        GCS_BUCKET_FLAG=""
         if [[ -n "$BUCKET_NAME_INPUT" ]]; then
           GCS_BUCKET="gs://${BUCKET_NAME_INPUT}"
+          GCS_BUCKET_FLAG="--gcs-source-staging-dir=${GCS_BUCKET}/${BUCKET_DIR_INPUT}"
+          ARGS+=("$GCS_BUCKET_FLAG")
         fi
 
-        GCS_BUCKET_FLAG="--gcs-source-staging-dir=\"$GCS_BUCKET/$BUCKET_DIR_INPUT\""
+        CONFIG_FILE="$SOURCE_INPUT/cloudbuild.yaml"
+        if [[ ! -f "$CONFIG_FILE" && -f "cloudbuild.yaml" ]]; then
+          CONFIG_FILE="cloudbuild.yaml"
+        fi
 
         BUILD_METHOD="$BUILDER_INPUT"
         if [[ -z "$BUILD_METHOD" ]]; then
-          if [[ -f "$SOURCE_INPUT/Dockerfile" ]]; then
+          if [[ -f "$CONFIG_FILE" ]]; then
+            BUILD_METHOD="cloudbuild"
+          elif [[ -f "$SOURCE_INPUT/Dockerfile" ]]; then
             BUILD_METHOD="dockerfile"
           else
             BUILD_METHOD="buildpack"
           fi
         fi
 
+        BUILD_FLAG=""
+        if [[ "$BUILD_METHOD" == "cloudbuild" ]]; then
+          BUILD_FLAG="--config=${CONFIG_FILE}"
+          ARGS+=("$BUILD_FLAG")
+        elif [[ "$BUILD_METHOD" == "dockerfile" ]]; then
+          BUILD_FLAG="--tag=${IMAGE_INPUT}"
+          ARGS+=("$BUILD_FLAG")
+        elif [[ "$BUILD_METHOD" == "buildpack" ]]; then
+          BUILD_FLAG="--pack image=${IMAGE_INPUT}"
+          ARGS+=("--pack" "image=${IMAGE_INPUT}")
+        else
+          echo "::error::Invalid builder '${BUILD_METHOD}'. Must be 'cloudbuild', 'dockerfile', 'buildpack', or ''."
+          exit 1
+        fi
+
         echo "Building image: $IMAGE_INPUT"
         echo "Source directory: $SOURCE_INPUT"
-        ls -l $SOURCE_INPUT
+        ls -l -- "$SOURCE_INPUT"
 
         BUILD_SERVICE_ACCOUNT_FLAG=""
         if [[ -n "$BUILD_SERVICE_ACCOUNT_INPUT" ]]; then
           BUILD_SERVICE_ACCOUNT_FLAG="--service-account=$BUILD_SERVICE_ACCOUNT_INPUT"
+          ARGS+=("$BUILD_SERVICE_ACCOUNT_FLAG")
         fi
 
         SUBSTITUTIONS_FLAG=""
         if [[ -n "$SUBSTITUTIONS_INPUT" ]]; then
-          SUBSTITUTIONS_FLAG="--substitutions=\"$SUBSTITUTIONS_INPUT\""
+          SUBSTITUTIONS_FLAG="--substitutions=$SUBSTITUTIONS_INPUT"
+          ARGS+=("$SUBSTITUTIONS_FLAG")
         fi
 
         # Merge all flags just before the submit command
-        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG} ${SUBSTITUTIONS_FLAG}"
-        eval gcloud builds submit --config cloudbuild.yaml $FLAGS "$SOURCE_INPUT"
+        FLAGS="${QUIET_FLAG} ${IMPERSONATE_FLAG} ${BUILD_FLAG} ${GCS_BUCKET_FLAG} ${BUILD_SERVICE_ACCOUNT_FLAG} ${SUBSTITUTIONS_FLAG}"
+        gcloud builds submit "${ARGS[@]}" -- "$SOURCE_INPUT"
 
-        echo "image-url=${IMAGE_INPUT}" >> $GITHUB_OUTPUT
+        echo "image-url=${IMAGE_INPUT}" >> "$GITHUB_OUTPUT"
         echo "Successfully built image: $IMAGE_INPUT"
 
 branding:
