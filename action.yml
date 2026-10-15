@@ -12,7 +12,7 @@ inputs:
     required: false
 
   impersonate:
-    description: "Service account email to impersonate for to submit the gcloud build. If not set, uses the default credentials."
+    description: "Service account email to impersonate to submit the gcloud build. If not set, uses the default credentials."
     required: false
 
   build_service_account:

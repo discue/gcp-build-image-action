@@ -6,7 +6,7 @@ A GitHub Action to build and push container images to Google Cloud using Cloud B
 
 - 🚀 Build container images using Google Cloud Build
 - 📦 Uses Cloud Native Buildpacks for automatic image creation or custom Dockerfiles
-- 🔧 Configurable project, region, and build settings
+- 🔧 Configurable region, builder, and build settings
 - ⚡ Simple and lightweight composite action
 
 ## Prerequisites
@@ -81,7 +81,7 @@ jobs:
 | `builder` | Build method: `cloudbuild` (uses `cloudbuild.yaml`), `dockerfile` (uses your `Dockerfile`), or `buildpack` (uses Cloud Native Buildpacks). If not set, the action auto-detects `cloudbuild.yaml`, then `Dockerfile`, otherwise `buildpack`. | No | Auto-detect |
 | `staging_bucket_name` | Cloud Storage bucket name to use for staging (without `gs://` or path) | No | GCP default (`$project_$region_cloudbuild`) |
 | `staging_bucket_dir` | Directory within the Cloud Storage bucket to use for staging | No | `builds` |
-| `substitutions` | Parameters to be substituted in the build specification (multiline `KEY=VALUE` or comma-separated `KEY=VALUE`) | No | `""` |
+| `substitutions` | Parameters to be substituted in the build specification (multiline `KEY=VALUE` or comma-separated `KEY=VALUE`) | No | - |
 
 ## Outputs
 
@@ -175,7 +175,7 @@ jobs:
 
 The action will fail if:
 - Google Cloud authentication is not set up
-- The specified project or region is invalid
+- The specified region or image is invalid
 - Cloud Build API is not enabled
 - Insufficient IAM permissions
 - Invalid image URL format
