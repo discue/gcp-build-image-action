@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.1](https://github.com/discue/gcp-build-image-action/compare/v1.4.0...v1.4.1) (2026-10-22)
+
+
+### Miscellaneous Chores
+
+* **docs:** update documentation ([793ba5b](https://github.com/discue/gcp-build-image-action/commit/793ba5b7f483b110058687c7d0ff7bc071416bd9))
+* standardize release-please and stale workflows ([86b71a6](https://github.com/discue/gcp-build-image-action/commit/86b71a683712f1ad9fab1b21d0bdf6e142fd48df))
+* standardize release-please and stale workflows ([868e135](https://github.com/discue/gcp-build-image-action/commit/868e135f2b7b9fa31bcdadffbcaaaf46f0e00e82))
+
 ## [1.4.0](https://github.com/discue/gcp-build-image-action/compare/v1.3.0...v1.4.0) (2026-10-13)
 
 
