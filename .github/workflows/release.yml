@@ -7,8 +7,8 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   issues: write
+  pull-requests: write
 
 jobs:
   release-please:
@@ -16,6 +16,5 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v5
         with:
-          # For GitHub Actions, we don't need a specific release type
-          # release-please will auto-detect based on the repository structure
-          release-type: simple
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
